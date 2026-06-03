@@ -2,14 +2,8 @@
 #
 # Build on the Pi:
 #   docker build -t picamera2:latest .
-#
-# Examples:
-#   docker build --build-arg ROS_DISTRO=humble --build-arg PICAMERA2_COMMIT=v0.3.0 -t picamera2:humble .
-#   docker build --build-arg LIBCAMERA_COMMIT=v0.5.0 --build-arg PICAMERA2_COMMIT=v0.3.27 -t picamera2:latest .
 
 ARG ROS_DISTRO=jazzy
-ARG LIBCAMERA_COMMIT=main
-ARG PICAMERA2_COMMIT=main
 
 FROM ros:${ROS_DISTRO}-ros-base
 
@@ -40,15 +34,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgnutls28-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY scripts/git_clone_ext.sh /usr/local/bin/git_clone_ext.sh
-RUN chmod +x /usr/local/bin/git_clone_ext.sh
-
-RUN /usr/local/bin/git_clone_ext.sh \
-        https://github.com/raspberrypi/libcamera.git \
-        /tmp/libcamera \
-        "$LIBCAMERA_COMMIT" \
-    && cd /tmp/libcamera \
-    && meson setup build --buildtype=release \
+RUN git clone --depth 1 https://github.com/raspberrypi/libcamera.git /tmp/libcamera \
+    && meson setup /tmp/libcamera/build /tmp/libcamera \
+        --buildtype=release \
         -Dpipelines=rpi/vc4,rpi/pisp \
         -Dipas=rpi/vc4,rpi/pisp \
         -Dv4l2=true \
@@ -59,7 +47,7 @@ RUN /usr/local/bin/git_clone_ext.sh \
         -Dqcam=disabled \
         -Ddocumentation=disabled \
         -Dpycamera=enabled \
-    && ninja -C build install \
+    && ninja -C /tmp/libcamera/build install \
     && ldconfig \
     && test -n "$(find /usr/local -name '_libcamera*.so' -print -quit)" \
     && rm -rf /tmp/libcamera
@@ -72,11 +60,7 @@ RUN git clone --depth 1 https://github.com/tomba/kmsxx.git /tmp/kmsxx \
     && test -n "$(find /usr/local -path '*/pykms/pykms*.so' -print -quit)" \
     && rm -rf /tmp/kmsxx
 
-ARG PICAMERA2_COMMIT=main
-RUN /usr/local/bin/git_clone_ext.sh \
-        https://github.com/raspberrypi/picamera2.git \
-        /tmp/picamera2 \
-        "$PICAMERA2_COMMIT" \
+RUN git clone --depth 1 https://github.com/raspberrypi/picamera2.git /tmp/picamera2 \
     && cd /tmp/picamera2 \
     && (pip3 install . --break-system-packages --no-deps \
         || pip3 install . --no-deps) \

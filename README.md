@@ -76,14 +76,6 @@ python3 /root/capture_headless.py
 
 This saves `demo.jpg` in the container working directory.
 
-## ROS2 Humble?
-
-NOT WORKING ... as it complains about unsupported build flags.
-
-```bash
-docker build --build-arg ROS_DISTRO=humble --build-arg PICAMERA2_COMMIT=v0.3.0 -t picamera2:humble .
-```~~
-
 ## License
 
 MIT — see [LICENSE](LICENSE).
