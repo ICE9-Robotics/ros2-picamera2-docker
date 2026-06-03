@@ -38,7 +38,7 @@ The build takes a while (compiles libcamera and kmsxx). It fails early if Python
 ## Run the container
 
 ```bash
-mkdir -p mnt
+mkdir mnt
 
 docker run -it --rm \
   --privileged \
