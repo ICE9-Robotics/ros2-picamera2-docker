@@ -23,7 +23,14 @@ dtoverlay=vc4-kms-v3d
 EOF
 ```
 
-## Build the image
+## Install docker
+
+#### Option 1 - Pull from docker hub
+```bash
+docker pull anthonyzyj/ros2-picamera2-docker:jazzy
+```
+
+#### Option 2 - Build from source
 
 Build **on the Pi** (same CPU architecture as the robot):
 
